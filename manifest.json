@@ -1,0 +1,10 @@
+{
+	"id": "wikilink-when-paste-note-name",
+	"name": "Wikilink when paste note name",
+	"version": "1.0.0",
+	"minAppVersion": "1.0.0",
+	"description": "If note with copied text exists, paste as wikilink",
+	"author": "zoodogood",
+	"authorUrl": "https://github.com/zoodogood/obsidian-wikilink-when-paste",
+	"isDesktopOnly": false
+}
