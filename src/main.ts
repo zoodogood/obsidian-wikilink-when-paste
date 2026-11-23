@@ -1,10 +1,10 @@
 import { Editor, MarkdownFileInfo, MarkdownView, Plugin } from 'obsidian';
-import { handleDomPaste } from './dom-paste-handler';
+import { resolveWikilinkForPaste } from './checkers/vault-links';
+import { getWordAtOffset } from './checkers/word-on-cursor';
 import { insertWikilinkWithUndoSteps, ReplaceRangeSpec } from './editor-paste';
-import { resolveWikilinkForPaste } from './link-handler';
+import { handleDomPaste } from './listners/dom-paste-for-editor-paste';
 import { SettingTab } from './settings';
 import { DEFAULT_SETTINGS, WikilinkPasteSettings } from './types';
-import { getWordAtOffset } from './word-helper';
 
 export default class Plugin_WikilinkWhenPasteNoteName extends Plugin {
 	settings!: WikilinkPasteSettings;

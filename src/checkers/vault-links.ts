@@ -1,5 +1,5 @@
 import { App, TFile } from 'obsidian';
-import { WikilinkPasteSettings } from './types';
+import { WikilinkPasteSettings } from '../types';
 
 const TWELVE_DIGITS_REGEX = /^\d{12}$/;
 

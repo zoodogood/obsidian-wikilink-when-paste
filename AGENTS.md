@@ -6,6 +6,13 @@
 - Entry point: `src/main.ts` compiled to `dist/main.js` and loaded by Obsidian.
 - Build output directory: `dist/`. Required release artifacts: `dist/main.js`, `dist/manifest.json`, and optional `dist/styles.css`.
 
+## File naming convention & structure
+
+Have `listeners/commands`, `ui`, `listeners` folders for entrypoins, if using
+"word-helper" -> "checkers/cursor-on-word"
+"dom-paste-handler" -> "listeners/dom-paste-for-editor-paste"
+"link-checker" -> "checkers/vault-links"
+
 ## Environment & tooling
 
 - Node.js: use current LTS (Node 18+ recommended).

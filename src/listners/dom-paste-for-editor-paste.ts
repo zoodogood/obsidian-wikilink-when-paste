@@ -1,7 +1,7 @@
 import { App, MarkdownView } from 'obsidian';
-import { resolveWikilinkForPaste } from './link-handler';
-import { WikilinkPasteSettings } from './types';
-import { getWordAtOffset } from './word-helper';
+import { resolveWikilinkForPaste } from '../checkers/vault-links';
+import { getWordAtOffset } from '../checkers/word-on-cursor';
+import { WikilinkPasteSettings } from '../types';
 
 /**
  * Handles DOM-level paste events, especially for frontmatter GUI properties
