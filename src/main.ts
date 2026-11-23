@@ -1,9 +1,10 @@
 import { Editor, MarkdownFileInfo, MarkdownView, Plugin } from 'obsidian';
 import { handleDomPaste } from './dom-paste-handler';
-import { insertWikilinkWithUndoSteps } from './editor-paste';
+import { insertWikilinkWithUndoSteps, ReplaceRangeSpec } from './editor-paste';
 import { resolveWikilinkForPaste } from './link-handler';
 import { SettingTab } from './settings';
 import { DEFAULT_SETTINGS, WikilinkPasteSettings } from './types';
+import { getWordAtOffset } from './word-helper';
 
 export default class Plugin_WikilinkWhenPasteNoteName extends Plugin {
 	settings!: WikilinkPasteSettings;
@@ -24,7 +25,28 @@ export default class Plugin_WikilinkWhenPasteNoteName extends Plugin {
 					if (!clipboardText) return;
 
 					const sourcePath = info.file?.path ?? '';
-					const selectedText = editor.getSelection();
+					let selectedText = editor.getSelection();
+					let targetRange: ReplaceRangeSpec | undefined;
+
+					// If no text is selected and the option is enabled, check for word under cursor
+					if (!selectedText && this.settings.replaceWordUnderCursor) {
+						const cursor = editor.getCursor();
+						const lineText = editor.getLine(cursor.line);
+						const wordBoundary = getWordAtOffset(lineText, cursor.ch);
+
+						if (wordBoundary) {
+							selectedText = wordBoundary.word;
+							const startOffset = editor.posToOffset({
+								line: cursor.line,
+								ch: wordBoundary.start,
+							});
+							const endOffset = editor.posToOffset({
+								line: cursor.line,
+								ch: wordBoundary.end,
+							});
+							targetRange = { from: startOffset, to: endOffset };
+						}
+					}
 
 					const result = resolveWikilinkForPaste(
 						this.app,
@@ -39,7 +61,12 @@ export default class Plugin_WikilinkWhenPasteNoteName extends Plugin {
 					}
 
 					evt.preventDefault();
-					insertWikilinkWithUndoSteps(editor, clipboardText, result.linkText);
+					insertWikilinkWithUndoSteps(
+						editor,
+						clipboardText,
+						result.linkText,
+						targetRange,
+					);
 				},
 			),
 		);
@@ -55,7 +82,7 @@ export default class Plugin_WikilinkWhenPasteNoteName extends Plugin {
 		);
 	}
 
-	onunload() {}
+	onunload() { }
 
 	async loadSettings() {
 		this.settings = Object.assign(

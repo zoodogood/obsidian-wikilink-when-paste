@@ -1,6 +1,7 @@
 import { App, MarkdownView } from 'obsidian';
 import { resolveWikilinkForPaste } from './link-handler';
 import { WikilinkPasteSettings } from './types';
+import { getWordAtOffset } from './word-helper';
 
 /**
  * Handles DOM-level paste events, especially for frontmatter GUI properties
@@ -37,11 +38,29 @@ export function handleDomPaste(
 	const sourcePath = activeView?.file?.path ?? '';
 
 	let selectedText = '';
+	let targetStart = 0;
+	let targetEnd = 0;
+
 	if (isInput) {
 		const start = target.selectionStart ?? 0;
 		const end = target.selectionEnd ?? 0;
 		if (start !== end) {
 			selectedText = target.value.substring(start, end);
+			targetStart = start;
+			targetEnd = end;
+		} else if (settings.replaceWordUnderCursor) {
+			const wordBoundary = getWordAtOffset(target.value, start);
+			if (wordBoundary) {
+				selectedText = wordBoundary.word;
+				targetStart = wordBoundary.start;
+				targetEnd = wordBoundary.end;
+			} else {
+				targetStart = start;
+				targetEnd = end;
+			}
+		} else {
+			targetStart = start;
+			targetEnd = end;
 		}
 	} else if (isContentEditable) {
 		const sel = window.getSelection();
@@ -68,6 +87,8 @@ export function handleDomPaste(
 	const linkToInsert = result.linkText;
 
 	if (isInput) {
+		target.setSelectionRange(targetStart, targetEnd);
+
 		const doc = document as unknown as {
 			execCommand?: (commandId: string, showUI?: boolean, value?: string) => boolean;
 		};
@@ -83,9 +104,7 @@ export function handleDomPaste(
 		}
 
 		if (!executed) {
-			const start = target.selectionStart ?? 0;
-			const end = target.selectionEnd ?? 0;
-			target.setRangeText(linkToInsert, start, end, 'end');
+			target.setRangeText(linkToInsert, targetStart, targetEnd, 'end');
 		}
 
 		target.dispatchEvent(new Event('input', { bubbles: true }));

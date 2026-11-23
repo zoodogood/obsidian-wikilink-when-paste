@@ -37,6 +37,14 @@ export class SettingTab extends PluginSettingTab {
 					},
 				},
 			},
+			{
+				name: 'Replace word under cursor without selection',
+				desc: 'If no text is selected but the cursor is inside a word, automatically use the word under the cursor as the alias (hyphens are not included).',
+				control: {
+					type: 'toggle',
+					key: 'replaceWordUnderCursor',
+				},
+			},
 		];
 	}
 
@@ -71,6 +79,20 @@ export class SettingTab extends PluginSettingTab {
 					.setValue(this.plugin.settings.timestampPatternMode)
 					.onChange(async (value) => {
 						this.plugin.settings.timestampPatternMode = value as TimestampPasteOption;
+						await this.plugin.saveSettings();
+					});
+			});
+
+		new Setting(containerEl)
+			.setName('Replace word under Cursor without selection')
+			.setDesc(
+				'If no text is selected but the Cursor is inside a word, use that word as the link alias (hyphen is treated as boundary).',
+			)
+			.addToggle((toggle) => {
+				toggle
+					.setValue(this.plugin.settings.replaceWordUnderCursor)
+					.onChange(async (value) => {
+						this.plugin.settings.replaceWordUnderCursor = value;
 						await this.plugin.saveSettings();
 					});
 			});
